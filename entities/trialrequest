@@ -1,0 +1,35 @@
+{
+  "name": "TrialRequest",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "project_name": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "download_link": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "delivered"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "user_email",
+    "project_name",
+    "download_link"
+  ]
+}
