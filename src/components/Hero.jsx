@@ -1,42 +1,28 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
-const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
+// Titre "SCAVBACK" : SCAV blanc, BACK rouge. Reveal lettre par lettre au chargement (une seule fois).
+const TITLE = [
+  { ch: 'S', color: '#ffffff' },
+  { ch: 'C', color: '#ffffff' },
+  { ch: 'A', color: '#ffffff' },
+  { ch: 'V', color: '#ffffff' },
+  { ch: 'B', color: '#8B0000' },
+  { ch: 'A', color: '#8B0000' },
+  { ch: 'C', color: '#8B0000' },
+  { ch: 'K', color: '#8B0000' },
+];
+
+const titleContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+const titleLetter = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+};
 
 export default function Hero() {
-  const titleRef = useRef(null);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    const el = titleRef.current;
-    if (!el) return;
-
-    const handleMouseOver = () => {
-      let iteration = 0;
-      clearInterval(intervalRef.current);
-      intervalRef.current = setInterval(() => {
-        el.innerHTML = 'SCAVBACK'
-          .split('')
-          .map((letter, index) => {
-            if (index < iteration) {
-              const isBack = index >= 4;
-              return `<span style="color:${isBack ? '#8B0000' : 'white'}">${'SCAVBACK'[index]}</span>`;
-            }
-            return `<span style="color:#cc0000">${LETTERS[Math.floor(Math.random() * LETTERS.length)]}</span>`;
-          })
-          .join('');
-        if (iteration >= 8) clearInterval(intervalRef.current);
-        iteration += 0.3;
-      }, 30);
-    };
-
-    el.addEventListener('mouseover', handleMouseOver);
-    return () => {
-      el.removeEventListener('mouseover', handleMouseOver);
-      clearInterval(intervalRef.current);
-    };
-  }, []);
-
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#020202]">
       {/* Background Image: Church / Building (Image 2) */}
@@ -78,9 +64,19 @@ export default function Hero() {
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="relative"
         >
-          <h1 ref={titleRef} className="text-6xl md:text-8xl lg:text-[10rem] font-space font-bold tracking-tighter uppercase leading-none mix-blend-difference">
-            <span style={{color:'white'}}>SCAV</span><span style={{color:'#8B0000'}}>BACK</span>
-          </h1>
+          <motion.h1
+            variants={titleContainer}
+            initial="hidden"
+            animate="visible"
+            aria-label="SCAVBACK"
+            className="text-6xl md:text-8xl lg:text-[10rem] font-space font-bold tracking-tighter uppercase leading-none mix-blend-difference"
+          >
+            {TITLE.map((l, i) => (
+              <motion.span key={i} variants={titleLetter} style={{ color: l.color, display: 'inline-block' }}>
+                {l.ch}
+              </motion.span>
+            ))}
+          </motion.h1>
         </motion.div>
         
         <motion.div 

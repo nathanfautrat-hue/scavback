@@ -6,12 +6,11 @@ import CguModal from '../components/CguModal';
 import { useNavigate } from 'react-router-dom';
 import { emailConfirmationCommande } from '../components/emailTemplates';
 
-const SERVICES = [
-  { id: 'mix_instru', label: 'Mixage instrumentale', price: 10, desc: 'Mixage complet de votre instrumentale.' },
-  { id: 'mix_voix', label: 'Mixage voix', price: 10, desc: 'Mixage complet de vos pistes voix.' },
-  { id: 'mastering', label: 'Mastering', price: 10, desc: 'Masterisation pour répondre aux standards des plateformes de streaming.' },
-  { id: 'edition', label: 'Édition', price: 5, desc: "Nettoyage complet et édition de vos pistes. Inclut modification/ajout de pistes (limite 2 lots)." },
-  { id: 'sfx', label: 'SFX', price: 5, desc: "Ajout d'effets pour dynamiser votre musique : drops, risers, bruitages, etc." },
+// Grille tarifaire (cahier des charges #01) — 3 offres exclusives + essai gratuit (onglet séparé)
+const OFFERS = [
+  { id: 'mix_master', label: 'Mix + Master', price: 20, desc: 'Mixage complet de votre morceau + mastering prêt pour les plateformes de streaming.' },
+  { id: 'mix', label: 'Mix seul', price: 10, desc: 'Mixage complet : balance, EQ, compression et spatialisation pour un rendu professionnel.' },
+  { id: 'master', label: 'Master seul', price: 10, desc: 'Masterisation pour répondre aux standards des plateformes de streaming.' },
 ];
 
 const PAYS = ['France', 'Belgique', 'Suisse', 'Canada', 'Luxembourg', 'Autre'];
@@ -170,7 +169,7 @@ function EssaiGratuitTab({ user }) {
 // ─── ONGLET PASSER COMMANDE ───────────────────────────────────────────────────
 function PasserCommandeTab({ user }) {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState({});
+  const [selectedOffer, setSelectedOffer] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [info, setInfo] = useState({ prenom: '', nom: '', adresse: '', complement: '', pays: 'France', ville: '', code_postal: '' });
   const [cguChecked, setCguChecked] = useState(false);
@@ -178,18 +177,12 @@ function PasserCommandeTab({ user }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const toggleService = (id) => setSelected(prev => ({ ...prev, [id]: !prev[id] }));
-
-  const hasMix = selected['mix_instru'] || selected['mix_voix'];
-  const selectedServices = SERVICES.filter(s => selected[s.id]);
-  const unitTotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
-  const total = unitTotal * quantity;
+  const offer = OFFERS.find(o => o.id === selectedOffer) || null;
+  const total = (offer ? offer.price : 0) * quantity;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const onlyOptions = selectedServices.every(s => ['mastering', 'edition', 'sfx'].includes(s.id));
-    if (selectedServices.length === 0) { setError("Veuillez sélectionner au moins un forfait."); return; }
-    if (onlyOptions) { setError('Vous devez sélectionner au minimum "Mixage instrumentale" ou "Mixage voix" pour ajouter les options.'); return; }
+    if (!offer) { setError("Veuillez sélectionner une offre."); return; }
     if (!info.prenom || !info.nom || !info.ville || !info.code_postal) { setError("Veuillez remplir toutes les informations personnelles."); return; }
     if (!cguChecked) { setError("Veuillez accepter les CGV et CGU."); return; }
 
@@ -197,14 +190,13 @@ function PasserCommandeTab({ user }) {
     setLoading(true);
 
     const orderNumber = generateOrderNumber();
-    const serviceLabels = selectedServices.map(s => s.label);
 
     const order = await base44.entities.Order.create({
       order_number: orderNumber,
       user_email: user.email,
       user_name: user.full_name || user.email,
       ...info,
-      services: serviceLabels,
+      services: [offer.label],
       quantity,
       total,
       status: 'pending'
@@ -229,30 +221,29 @@ function PasserCommandeTab({ user }) {
         {/* FORFAITS */}
         <div className="border border-white/[0.05] bg-[#040404]">
           <div className="px-6 py-4 border-b border-white/[0.05]">
-            <p className="text-[10px] font-mono text-[#4A5D66] uppercase tracking-widest">// CAT_01 — Forfaits</p>
+            <p className="text-[10px] font-mono text-[#4A5D66] uppercase tracking-widest">// CAT_01 — Choisissez votre offre</p>
           </div>
           <div className="divide-y divide-white/[0.05]">
-            {SERVICES.map(service => {
-              const isOption = ['mastering', 'edition', 'sfx'].includes(service.id);
-              const isDisabled = isOption && !hasMix && !selected[service.id];
+            {OFFERS.map(o => {
+              const active = selectedOffer === o.id;
               return (
                 <label
-                  key={service.id}
-                  className={`flex items-start gap-4 px-6 py-5 cursor-pointer group transition-colors ${selected[service.id] ? 'bg-white/[0.03]' : 'hover:bg-white/[0.02]'} ${isDisabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  key={o.id}
+                  className={`flex items-start gap-4 px-6 py-5 cursor-pointer group transition-colors ${active ? 'bg-white/[0.03]' : 'hover:bg-white/[0.02]'}`}
                 >
                   <input
-                    type="checkbox"
-                    checked={!!selected[service.id]}
-                    onChange={() => !isDisabled && toggleService(service.id)}
-                    disabled={isDisabled}
+                    type="radio"
+                    name="offer"
+                    checked={active}
+                    onChange={() => setSelectedOffer(o.id)}
                     className="mt-1 accent-white flex-shrink-0"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-space font-bold uppercase tracking-wider text-gray-300 group-hover:text-white transition-colors">{service.label}</span>
-                      <span className="text-base font-space font-bold text-white ml-4 flex-shrink-0">{service.price}€</span>
+                      <span className="text-sm font-space font-bold uppercase tracking-wider text-gray-300 group-hover:text-white transition-colors">{o.label}</span>
+                      <span className="text-base font-space font-bold text-white ml-4 flex-shrink-0">{o.price}€</span>
                     </div>
-                    <p className="text-[11px] font-mono text-gray-600 mt-1 leading-relaxed">{service.desc}</p>
+                    <p className="text-[11px] font-mono text-gray-600 mt-1 leading-relaxed">{o.desc}</p>
                   </div>
                 </label>
               );
@@ -326,8 +317,8 @@ function PasserCommandeTab({ user }) {
             <div>
               <p className="text-[10px] font-mono text-[#4A5D66] uppercase tracking-widest mb-1">Total calculé</p>
               <p className="text-[11px] font-mono text-gray-500">
-                {selectedServices.length > 0 ? selectedServices.map(s => s.label).join(', ') : '—'}
-                {selectedServices.length > 0 && quantity > 1 ? ` × ${quantity}` : ''}
+                {offer ? offer.label : '—'}
+                {offer && quantity > 1 ? ` × ${quantity}` : ''}
               </p>
             </div>
             <span className="text-3xl font-space font-bold text-white">{total.toFixed(2).replace('.', ',')}€</span>
@@ -349,7 +340,7 @@ function PasserCommandeTab({ user }) {
           )}
           <button
             type="submit"
-            disabled={loading || selectedServices.length === 0}
+            disabled={loading || !offer}
             className="w-full bg-white text-black font-mono text-xs font-bold uppercase tracking-widest py-4 hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? 'Traitement...' : <>Passer commande <ChevronRight size={14} /></>}

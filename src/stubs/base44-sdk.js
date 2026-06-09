@@ -25,10 +25,14 @@ export function createClient() {
   return {
     auth: {
       me: async () => {
-        // Pas connecté → throw pour que les pages tombent dans le catch
-        const err = new Error('Not authenticated (stub)');
-        err.status = 401;
-        throw err;
+        // Clone visuel : on simule un utilisateur connecté pour que les tunnels
+        // (Commander, Essai gratuit) soient visibles sans backend.
+        return {
+          id: 'mock_user',
+          email: 'demo@scavback.fr',
+          full_name: 'Utilisateur Démo',
+          role: 'user',
+        };
       },
       logout: noop,
       redirectToLogin: () => {

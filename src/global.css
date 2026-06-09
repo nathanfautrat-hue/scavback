@@ -24,6 +24,13 @@ input, textarea {
   user-select: text !important;
 }
 
+/* Curseur texte natif restauré sur les champs (le reste du site est cursor:none) */
+input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+textarea,
+[contenteditable="true"] {
+  cursor: text !important;
+}
+
 a, button, [role="button"], input[type="submit"], input[type="button"], label {
   cursor: none !important;
   opacity: 1;

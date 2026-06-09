@@ -1,7 +1,84 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import TerminalTooltip from '../components/TerminalTooltip';
+
+// Lien Spotify de l'artiste (fallback par défaut pour toutes les sorties).
+// ⚠️ À remplacer par les liens Spotify track-par-track quand dispo.
+const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
+
+// Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
+// (clic direct sur Spotify), conformément au cahier des charges #4.2.
+const YOUTUBE_BY_TITLE = {
+  'WATCH': 'https://www.youtube.com/watch?v=B7df6P2Su68',
+  'HPP': 'https://www.youtube.com/watch?v=LDZKdsZsTug',
+  'Brume': 'https://www.youtube.com/watch?v=s08ENSAHk1Q',
+  'BLEM!': 'https://www.youtube.com/watch?v=hF7LsY0auro',
+};
+
+// Ligne de sortie musicale avec popover Spotify/YouTube (#4.2).
+// - YouTube dispo  => popover 2 options (hover desktop / clic mobile)
+// - sinon          => clic ouvre directement Spotify
+function ReleaseRow({ index, title, duration, accent }) {
+  const [open, setOpen] = useState(false);
+  const spotify = SPOTIFY_ARTIST;
+  const youtube = YOUTUBE_BY_TITLE[title] || null;
+
+  const handleClick = () => {
+    if (youtube) setOpen(o => !o);
+    else if (spotify) window.open(spotify, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => youtube && setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <motion.div
+        whileHover={{ backgroundColor: 'rgba(255, 0, 170, 0.1)' }}
+        onClick={handleClick}
+        className="flex justify-between items-center cursor-pointer font-mono text-xs p-2 transition-colors group"
+      >
+        <span style={{ color: accent }} className="w-5 text-center">{index + 1}.</span>
+        <span className="text-white flex-1 ml-4 truncate">{title}</span>
+        {youtube && <span className="text-[#ff0000] text-[9px] mr-3 flex-shrink-0">▶ CLIP</span>}
+        <span style={{ color: accent }} className="ml-2 flex-shrink-0">{duration}</span>
+      </motion.div>
+
+      <AnimatePresence>
+        {open && youtube && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.17 }}
+            className="absolute right-2 top-full mt-1 z-50 flex flex-col gap-1 bg-black/90 backdrop-blur-sm border border-white/20 p-2 min-w-[190px] shadow-2xl"
+          >
+            <a
+              href={spotify}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 px-3 py-2 text-[11px] font-mono text-white hover:bg-[#1DB954]/20 hover:text-[#1DB954] transition-colors"
+            >
+              <span>🎵</span> Écouter sur Spotify
+            </a>
+            <a
+              href={youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 px-3 py-2 text-[11px] font-mono text-white hover:bg-[#ff0000]/20 hover:text-[#ff4444] transition-colors"
+            >
+              <span>▶️</span> Voir le clip
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 const MatrixRain = () => {
   return (
@@ -263,18 +340,7 @@ export default function Jumistx() {
                   />
                   <div className="flex-1 space-y-2 pt-2">
                     {album.map((song, idx) => (
-                      <TerminalTooltip key={idx} text="> LECTURE AUTORISÉE — CLIQUEZ POUR ACCÉDER" position="right">
-                        <motion.div
-                          whileHover={{ backgroundColor: 'rgba(255, 0, 170, 0.1)' }}
-                          className="flex justify-between items-center cursor-pointer font-mono text-xs p-2 transition-colors group"
-                        >
-                          <span className="text-[#ff00aa] w-5 text-center">{idx + 1}.</span>
-                          <span className="text-white flex-1 ml-4 truncate">
-                            {song.title}
-                          </span>
-                          <span className="text-[#ff00aa] ml-4">{song.duration}</span>
-                        </motion.div>
-                      </TerminalTooltip>
+                      <ReleaseRow key={idx} index={idx} title={song.title} duration={song.duration} accent="#ff00aa" />
                     ))}
                   </div>
                 </div>
@@ -289,16 +355,7 @@ export default function Jumistx() {
               </div>
               <div className="bg-[#0a0a0a] border border-dashed border-[#00ff41] p-4 space-y-2">
                 {songs.map((song, idx) => (
-                  <TerminalTooltip key={idx} text="> LECTURE AUTORISÉE — CLIQUEZ POUR ACCÉDER" position="right">
-                    <motion.div
-                      whileHover={{ backgroundColor: 'rgba(255, 0, 170, 0.1)' }}
-                      className="flex justify-between items-center cursor-pointer font-mono text-xs p-2 transition-colors group"
-                    >
-                      <span className="text-[#00ff41] w-5 text-center">{idx + 1}.</span>
-                      <span className="text-gray-400 flex-1 ml-4 truncate">{song.title}</span>
-                      <span className="text-[#00ff41] ml-4">{song.duration}</span>
-                    </motion.div>
-                  </TerminalTooltip>
+                  <ReleaseRow key={idx} index={idx} title={song.title} duration={song.duration} accent="#00ff41" />
                 ))}
               </div>
             </div>

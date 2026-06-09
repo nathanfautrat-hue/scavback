@@ -1,64 +1,96 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
+/**
+ * Curseur personnalisé épuré (cahier des charges #05).
+ * Petit cercle vide (outline) qui suit la souris avec un léger lag naturel.
+ * Au survol d'un élément cliquable (a, button, [role=button], label, .cursor-pointer)
+ * le cercle s'agrandit et se remplit partiellement.
+ * Masqué au-dessus des champs texte (input, textarea) où le curseur natif reprend.
+ */
 export default function CustomCursor() {
+  const dotRef = useRef(null);
+
   useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `* { cursor: none !important; }`;
-    document.head.appendChild(style);
+    // Pas de curseur custom sur appareil tactile
+    if (window.matchMedia('(pointer: coarse)').matches) return;
 
     const cursor = document.createElement('div');
     cursor.id = 'custom-cursor';
-    cursor.innerHTML = `
-      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-        <!-- Cercle extérieur fin -->
-        <circle cx="20" cy="20" r="18" stroke="white" stroke-width="0.8" fill="none" opacity="0.4"/>
-        <!-- Cercle principal rouge -->
-        <circle cx="20" cy="20" r="12" stroke="#cc0000" stroke-width="1.5" fill="none"/>
-        <!-- Croix haut -->
-        <line x1="20" y1="0" x2="20" y2="7" stroke="white" stroke-width="1"/>
-        <!-- Croix bas -->
-        <line x1="20" y1="33" x2="20" y2="40" stroke="white" stroke-width="1"/>
-        <!-- Croix gauche -->
-        <line x1="0" y1="20" x2="7" y2="20" stroke="white" stroke-width="1"/>
-        <!-- Croix droite -->
-        <line x1="33" y1="20" x2="40" y2="20" stroke="white" stroke-width="1"/>
-        <!-- Petit point central rouge -->
-        <circle cx="20" cy="20" r="1.5" fill="#cc0000"/>
-      </svg>
-    `;
     cursor.style.cssText = `
-      position: fixed;
+      position: fixed; top: 0; left: 0;
+      width: 14px; height: 14px;
+      border: 1.5px solid rgba(238,238,238,0.85);
+      border-radius: 50%;
+      background: transparent;
       pointer-events: none;
       z-index: 999999;
-      transform: translate(-50%, -50%);
-      top: -100px;
-      left: -100px;
+      transform: translate(-100px, -100px);
+      transition: width .18s ease, height .18s ease, background .18s ease, border-color .18s ease;
+      will-change: transform;
+      mix-blend-mode: difference;
     `;
     document.body.appendChild(cursor);
+    dotRef.current = cursor;
 
-    const moveCursor = (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+    // Position cible (souris) et position courante (lerp pour le lag)
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let curX = targetX;
+    let curY = targetY;
+    let raf;
+
+    const onMove = (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
     };
 
-    document.querySelectorAll('*').forEach(el => {
-      el.style.cursor = 'none';
-    });
+    const tick = () => {
+      // lerp ~0.2 => léger retard naturel
+      curX += (targetX - curX) * 0.2;
+      curY += (targetY - curY) * 0.2;
+      cursor.style.transform = `translate(${curX - cursor.offsetWidth / 2}px, ${curY - cursor.offsetHeight / 2}px)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
 
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll('*').forEach(el => {
-        el.style.cursor = 'none';
-      });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    const CLICKABLE = 'a, button, [role="button"], label, .cursor-pointer, input[type="submit"], input[type="button"]';
+    const TEXTFIELD = 'input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]), textarea, [contenteditable="true"]';
 
-    window.addEventListener('mousemove', moveCursor, false);
+    const reset = () => {
+      cursor.style.opacity = '1';
+      cursor.style.width = '14px';
+      cursor.style.height = '14px';
+      cursor.style.background = 'transparent';
+      cursor.style.borderColor = 'rgba(238,238,238,0.85)';
+    };
+    const grow = () => {
+      cursor.style.opacity = '1';
+      cursor.style.width = '26px';
+      cursor.style.height = '26px';
+      cursor.style.background = 'rgba(238,238,238,0.15)';
+      cursor.style.borderColor = 'rgba(238,238,238,0.95)';
+    };
+
+    const onOver = (e) => {
+      if (!e.target.closest) return;
+      if (e.target.closest(TEXTFIELD)) { cursor.style.opacity = '0'; return; } // champ texte → curseur natif
+      if (e.target.closest(CLICKABLE)) grow();
+    };
+    const onOut = (e) => {
+      if (!e.target.closest) return;
+      if (e.target.closest(TEXTFIELD) || e.target.closest(CLICKABLE)) reset();
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    document.addEventListener('mouseover', onOver, true);
+    document.addEventListener('mouseout', onOut, true);
 
     return () => {
-      window.removeEventListener('mousemove', moveCursor, false);
-      observer.disconnect();
+      cancelAnimationFrame(raf);
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseover', onOver, true);
+      document.removeEventListener('mouseout', onOut, true);
       if (cursor.parentElement) cursor.parentElement.removeChild(cursor);
-      if (style.parentElement) style.parentElement.removeChild(style);
     };
   }, []);
 

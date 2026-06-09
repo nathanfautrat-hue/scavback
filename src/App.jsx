@@ -8,12 +8,14 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import CustomCursor from '@/components/CustomCursor';
 import PageTransition from '@/components/PageTransition';
+import ScrollToTop from '@/components/ScrollToTop';
 import Commander from './pages/Commander';
 import Validation from './pages/Validation';
 import Discussion from './pages/Discussion';
 import ClientDiscussion from './pages/ClientDiscussion';
 import AdminSecret from './pages/AdminSecret';
 import Jumistx from './pages/Jumistx';
+import ApercuEmails from './pages/ApercuEmails';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -71,6 +73,7 @@ const AuthenticatedApp = () => {
       <Route path="/ClientDiscussion" element={<LayoutWrapper currentPageName="ClientDiscussion"><ClientDiscussion /></LayoutWrapper>} />
       <Route path="/AdminSecret" element={<AdminSecret />} />
       <Route path="/Jumistx" element={<LayoutWrapper currentPageName="Jumistx"><Jumistx /></LayoutWrapper>} />
+      <Route path="/ApercuEmails" element={<LayoutWrapper currentPageName="ApercuEmails"><ApercuEmails /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -84,6 +87,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <CustomCursor />
         <Router>
+          <ScrollToTop />
           <PageTransition />
           <AuthenticatedApp />
         </Router>
