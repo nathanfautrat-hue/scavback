@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { Lock, RefreshCw, ExternalLink } from 'lucide-react';
 import DiscussionModal from '@/components/DiscussionModal';
-import { emailCommandeAcceptee, emailCommandeRefusee } from '@/components/emailTemplates';
+import { emailCommandeAcceptee, emailCommandeRefusee } from '@/components/EmailTemplates';
 
 export default function AdminSecret() {
   const [code, setCode] = useState('');

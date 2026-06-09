@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Send, Paperclip, ArrowLeft } from 'lucide-react';
-import { playKeyboardClick, playSendSound } from '@/components/soundEffects';
+import { playKeyboardClick, playSendSound } from '@/components/SoundEffects';
 
 export default function Discussion() {
   const params = new URLSearchParams(window.location.search);

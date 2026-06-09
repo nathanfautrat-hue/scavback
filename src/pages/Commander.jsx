@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, ChevronRight, CheckCircle, Music, Palette, Film } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import CguModal from '../components/CguModal';
+import CguModal from '../components/CGUModal';
 import { useNavigate } from 'react-router-dom';
-import { emailConfirmationCommande } from '../components/emailTemplates';
+import { emailConfirmationCommande } from '../components/EmailTemplates';
 
 // Grille tarifaire (cahier des charges #01) — 3 offres exclusives + essai gratuit (onglet séparé)
 const OFFERS = [

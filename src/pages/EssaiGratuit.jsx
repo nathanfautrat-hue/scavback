@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import CguModal from '../components/CguModal';
-import { emailConfirmationEssai } from '../components/emailTemplates';
+import CguModal from '../components/CGUModal';
+import { emailConfirmationEssai } from '../components/EmailTemplates';
 
 export default function EssaiGratuit() {
   const [user, setUser] = useState(null);
