@@ -102,7 +102,7 @@ function trackingBox(orderNumber) {
       <p style="color:#999999;font-size:11px;letter-spacing:2px;margin:0 0 12px;font-family:Arial,sans-serif;">SUIVI DE COMMANDE</p>
       <p style="color:#cccccc;font-size:13px;line-height:1.9;margin:0;font-family:Arial,sans-serif;">
         Pour suivre votre commande :<br>
-        <span style="color:#ffffff;">1.</span> Rendez-vous sur <a href="https://scavback.base44.app" style="color:${BRAND};text-decoration:none;">scavback.base44.app</a><br>
+        <span style="color:#ffffff;">1.</span> Rendez-vous sur <a href="https://scavback.fr" style="color:${BRAND};text-decoration:none;">scavback.fr</a><br>
         <span style="color:#ffffff;">2.</span> Allez dans <strong style="color:#ffffff;">Commander → Vos commandes</strong><br>
         <span style="color:#ffffff;">3.</span> Entrez votre numéro : <strong style="color:#ffffff;">#${orderNumber}</strong>
       </p>
@@ -125,7 +125,7 @@ export function emailConfirmationCommande(order) {
     ${p(`Bonjour <strong style="color:#ffffff;">${prenom}</strong>, merci pour ta confiance ! Ta commande a bien été enregistrée et sera traitée après vérification du paiement.`)}
     ${orderInfoBox(order)}
     ${statusBadge('#3a2600', '#cc6600', '#ffaa44', '⏳ EN ATTENTE DE VÉRIFICATION')}
-    ${ctaButton('https://scavback.base44.app/Commander?tab=suivi', 'Suivre ma commande')}
+    ${ctaButton('https://scavback.fr/Commander?tab=suivi', 'Suivre ma commande')}
     ${trackingBox(order.order_number)}
   `;
   return { subject: `Ta commande SCAVBACK est confirmée 🎚️ — #${order.order_number}`, html: wrapTemplate(body) };
@@ -158,7 +158,7 @@ export function emailBienvenue(userName = 'Cher artiste') {
         <span style="color:#ffffff;">3.</span> On te livre un rendu pro
       </p>
     </div>
-    ${ctaButton('https://scavback.base44.app/Commander?tab=essai', 'Commencer mon essai gratuit')}
+    ${ctaButton('https://scavback.fr/Commander?tab=essai', 'Commencer mon essai gratuit')}
   `;
   return { subject: "Bienvenue dans l'univers SCAVBACK", html: wrapTemplate(body) };
 }
@@ -169,7 +169,7 @@ export function emailPanierAbandonne(userName = 'Cher artiste', offerLabel = 'to
     ${h2('Tu es à deux doigts...')}
     ${p(`Bonjour <strong style="color:#ffffff;">${userName}</strong>, tu as commencé une commande (<strong style="color:#ffffff;">${offerLabel}</strong>) mais tu ne l'as pas finalisée.`)}
     ${p('Ton son mérite un rendu pro. On garde ta sélection au chaud — il ne te reste qu\'à confirmer.')}
-    ${ctaButton('https://scavback.base44.app/Commander?tab=commande', 'Reprendre ma commande')}
+    ${ctaButton('https://scavback.fr/Commander?tab=commande', 'Reprendre ma commande')}
   `;
   return { subject: 'Tu es à deux doigts... — SCAVBACK Audio Lab', html: wrapTemplate(body) };
 }
