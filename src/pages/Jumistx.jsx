@@ -6,7 +6,7 @@ import TerminalTooltip from '../components/TerminalTooltip';
 // Page Spotify de l'artiste : utilisée pour les titres dont le lien n'est pas encore connu.
 const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
 
-// Lien Spotify de chaque titre. À compléter : Task. (page artiste en attendant).
+// Lien Spotify de chaque titre (page artiste en secours si un titre manque).
 const SPOTIFY_BY_TITLE = {
   '1,2,3 & 4.': 'https://open.spotify.com/track/63e8zBLRFZLFObW5X7HOwP',
   'SAND-TEST': 'https://open.spotify.com/track/3gy6qy0vZFOfZjzub3PXir',
@@ -23,6 +23,9 @@ const SPOTIFY_BY_TITLE = {
   'BLEM!': 'https://open.spotify.com/track/5IGDka59vexfDbJgbH0bwz',
   'Brume': 'https://open.spotify.com/track/1vZNuSI9pjrkpFG7jJzrCn',
   'WATCH': 'https://open.spotify.com/track/3PIhXRMJOuTqDmSYBpBI2B',
+  'Task.': 'https://open.spotify.com/track/2mLXdt0Y4NoGEPbkCWBhBD',
+  'ERR': 'https://open.spotify.com/track/6cdmiJyG9YRTThcxmOBZJG',
+  'ERR 2': 'https://open.spotify.com/track/2vkwlbn2dOtuokRtdfy3rE',
 };
 
 // Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
@@ -158,6 +161,8 @@ export default function Jumistx() {
   const [bioVisible, setBioVisible] = useState(false);
 
   const songs = [
+    { title: 'ERR 2', duration: '2:43' },
+    { title: 'ERR', duration: '2:36' },
     { title: '1,2,3 & 4.', duration: '2:02' },
     { title: 'SAND-TEST', duration: '2:30' },
     { title: 'JETPACK', duration: '2:04' },
