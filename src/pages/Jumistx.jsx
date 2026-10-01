@@ -6,13 +6,19 @@ import TerminalTooltip from '../components/TerminalTooltip';
 // Page Spotify de l'artiste : utilisée pour les titres dont le lien n'est pas encore connu.
 const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
 
-// Lien Spotify de chaque titre. À compléter : LIBIDO!, MIKI., Run Away., Task.,
-// La Planque., MIKI.2, LOLLIPOP, FLAIR (ils pointent sur la page artiste en attendant).
+// Lien Spotify de chaque titre. À compléter : Task. (pointe sur la page artiste en attendant).
 const SPOTIFY_BY_TITLE = {
   '1,2,3 & 4.': 'https://open.spotify.com/track/63e8zBLRFZLFObW5X7HOwP',
   'SAND-TEST': 'https://open.spotify.com/track/3gy6qy0vZFOfZjzub3PXir',
   'JETPACK': 'https://open.spotify.com/track/0TANAuWJzQal4N8KCwU5YM',
   'NYAN CAT': 'https://open.spotify.com/track/1mU8MbPENr2sa1KkUP7lZE',
+  'LOLLIPOP': 'https://open.spotify.com/track/3CZjxioQML6aLkzhURvHHD',
+  'MIKI.2': 'https://open.spotify.com/track/3iCDk18ubSA84S1oTXxms6',
+  'FLAIR': 'https://open.spotify.com/track/4VSPO9R74RzTkOua33YnS5',
+  'La Planque.': 'https://open.spotify.com/track/7wWM5Nh0bHR3unKlfq3xzr',
+  'LIBIDO!': 'https://open.spotify.com/track/4bS43LfFLcOfMdHaGYpcsZ',
+  'MIKI.': 'https://open.spotify.com/track/6Uk8vYmn6hvc1d2wEc7Ifq',
+  'Run Away.': 'https://open.spotify.com/track/55xoYyjpkHRsZbQ4M98gcK',
 };
 
 // Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
