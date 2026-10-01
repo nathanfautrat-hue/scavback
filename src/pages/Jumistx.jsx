@@ -6,7 +6,7 @@ import TerminalTooltip from '../components/TerminalTooltip';
 // Page Spotify de l'artiste : utilisée pour les titres dont le lien n'est pas encore connu.
 const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
 
-// Lien Spotify de chaque titre. À compléter : Task. et WATCH (page artiste en attendant).
+// Lien Spotify de chaque titre. À compléter : Task. (page artiste en attendant).
 const SPOTIFY_BY_TITLE = {
   '1,2,3 & 4.': 'https://open.spotify.com/track/63e8zBLRFZLFObW5X7HOwP',
   'SAND-TEST': 'https://open.spotify.com/track/3gy6qy0vZFOfZjzub3PXir',
@@ -22,6 +22,7 @@ const SPOTIFY_BY_TITLE = {
   'HPP': 'https://open.spotify.com/track/2GnhGObiwhOFeCazZpEEH5',
   'BLEM!': 'https://open.spotify.com/track/5IGDka59vexfDbJgbH0bwz',
   'Brume': 'https://open.spotify.com/track/1vZNuSI9pjrkpFG7jJzrCn',
+  'WATCH': 'https://open.spotify.com/track/3PIhXRMJOuTqDmSYBpBI2B',
 };
 
 // Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
