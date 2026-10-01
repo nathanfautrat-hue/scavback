@@ -3,9 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import TerminalTooltip from '../components/TerminalTooltip';
 
-// Lien Spotify de l'artiste (fallback par défaut pour toutes les sorties).
-// ⚠️ À remplacer par les liens Spotify track-par-track quand dispo.
+// Page Spotify de l'artiste : utilisée pour les titres dont le lien n'est pas encore connu.
 const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
+
+// Lien Spotify de chaque titre. À compléter : LIBIDO!, MIKI., Run Away., Task.,
+// La Planque., MIKI.2, LOLLIPOP, FLAIR (ils pointent sur la page artiste en attendant).
+const SPOTIFY_BY_TITLE = {
+  '1,2,3 & 4.': 'https://open.spotify.com/track/63e8zBLRFZLFObW5X7HOwP',
+  'SAND-TEST': 'https://open.spotify.com/track/3gy6qy0vZFOfZjzub3PXir',
+  'JETPACK': 'https://open.spotify.com/track/0TANAuWJzQal4N8KCwU5YM',
+  'NYAN CAT': 'https://open.spotify.com/track/1mU8MbPENr2sa1KkUP7lZE',
+};
 
 // Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
 // (clic direct sur Spotify), conformément au cahier des charges #4.2.
@@ -23,6 +31,24 @@ function ReleaseRow({ index, title, duration, accent }) {
   const [open, setOpen] = useState(false);
   const spotify = SPOTIFY_ARTIST;
   const youtube = YOUTUBE_BY_TITLE[title] || null;
+
+  // Titre sans clip : vrai lien vers sa page Spotify, ligne entière cliquable.
+  if (!youtube) {
+    return (
+      <a
+        href={SPOTIFY_BY_TITLE[title] || SPOTIFY_ARTIST}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Écouter ${title} sur Spotify`}
+        className="flex justify-between items-center min-h-[44px] font-mono text-xs px-2 py-3 transition-colors group hover:bg-[rgba(255,0,170,0.1)]"
+      >
+        <span style={{ color: accent }} className="w-5 text-center">{index + 1}.</span>
+        <span className="text-white flex-1 ml-4 truncate underline-offset-4 decoration-[#ff00aa] group-hover:underline group-hover:text-[#ff00aa] transition-colors">{title}</span>
+        <span className="text-[#1DB954] text-[9px] mr-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">♫ SPOTIFY</span>
+        <span style={{ color: accent }} className="ml-2 flex-shrink-0">{duration}</span>
+      </a>
+    );
+  }
 
   const handleClick = () => {
     if (youtube) setOpen(o => !o);

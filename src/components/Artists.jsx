@@ -24,16 +24,6 @@ const beatmakers = [
       { label: 'TikTok', href: 'https://www.tiktok.com/@plugz_beatz?_r=1&_t=ZG-94bD9K8Ylyi' }
     ],
     image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/699ee2f7ff8ae9f68639cff6/5c802336b_logo.jpg"
-  },
-  {
-    name: "Mael.wave",
-    role: "Beatmaker",
-    description: "Univers sonore profond, entre ambient et trap expérimentale.",
-    links: [
-      { label: 'VVault', href: 'https://www.vvault.app/mael-wave' },
-      { label: 'TikTok', href: 'https://www.tiktok.com/@maelkz0?_r=1&_t=ZN-94bDGNXpVMk' }
-    ],
-    image: "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/699ee2f7ff8ae9f68639cff6/b7c4f2272_1772960912859.jpg"
   }
 ];
 

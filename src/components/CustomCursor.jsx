@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Curseur personnalisé épuré (cahier des charges #05).
- * Petit cercle vide (outline) qui suit la souris avec un léger lag naturel.
+ * Petit cercle vide (outline) collé à la souris, sans aucun retard.
  * Au survol d'un élément cliquable (a, button, [role=button], label, .cursor-pointer)
  * le cercle s'agrandit et se remplit partiellement.
  * Masqué au-dessus des champs texte (input, textarea) où le curseur natif reprend.
@@ -24,7 +24,7 @@ export default function CustomCursor() {
       background: transparent;
       pointer-events: none;
       z-index: 999999;
-      transform: translate(-100px, -100px);
+      transform: translate3d(-100px, -100px, 0);
       transition: width .18s ease, height .18s ease, background .18s ease, border-color .18s ease;
       will-change: transform;
       mix-blend-mode: difference;
@@ -32,26 +32,11 @@ export default function CustomCursor() {
     document.body.appendChild(cursor);
     dotRef.current = cursor;
 
-    // Position cible (souris) et position courante (lerp pour le lag)
-    let targetX = window.innerWidth / 2;
-    let targetY = window.innerHeight / 2;
-    let curX = targetX;
-    let curY = targetY;
-    let raf;
-
+    // Position appliquée directement dans l'événement : aucun lissage, aucun retard.
+    // Le translate(-50%, -50%) garde le cercle centré même quand il change de taille.
     const onMove = (e) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
     };
-
-    const tick = () => {
-      // lerp ~0.2 => léger retard naturel
-      curX += (targetX - curX) * 0.2;
-      curY += (targetY - curY) * 0.2;
-      cursor.style.transform = `translate(${curX - cursor.offsetWidth / 2}px, ${curY - cursor.offsetHeight / 2}px)`;
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
 
     const CLICKABLE = 'a, button, [role="button"], label, .cursor-pointer, input[type="submit"], input[type="button"]';
     const TEXTFIELD = 'input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]), textarea, [contenteditable="true"]';
@@ -81,13 +66,12 @@ export default function CustomCursor() {
       if (e.target.closest(TEXTFIELD) || e.target.closest(CLICKABLE)) reset();
     };
 
-    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('mouseover', onOver, true);
     document.addEventListener('mouseout', onOut, true);
 
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('pointermove', onMove);
       document.removeEventListener('mouseover', onOver, true);
       document.removeEventListener('mouseout', onOut, true);
       if (cursor.parentElement) cursor.parentElement.removeChild(cursor);
