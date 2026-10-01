@@ -6,7 +6,7 @@ import TerminalTooltip from '../components/TerminalTooltip';
 // Page Spotify de l'artiste : utilisée pour les titres dont le lien n'est pas encore connu.
 const SPOTIFY_ARTIST = 'https://open.spotify.com/intl-fr/artist/2CN7bJfF3enS70MviDKhxe';
 
-// Lien Spotify de chaque titre. À compléter : Task. (pointe sur la page artiste en attendant).
+// Lien Spotify de chaque titre. À compléter : Task. et WATCH (page artiste en attendant).
 const SPOTIFY_BY_TITLE = {
   '1,2,3 & 4.': 'https://open.spotify.com/track/63e8zBLRFZLFObW5X7HOwP',
   'SAND-TEST': 'https://open.spotify.com/track/3gy6qy0vZFOfZjzub3PXir',
@@ -19,6 +19,9 @@ const SPOTIFY_BY_TITLE = {
   'LIBIDO!': 'https://open.spotify.com/track/4bS43LfFLcOfMdHaGYpcsZ',
   'MIKI.': 'https://open.spotify.com/track/6Uk8vYmn6hvc1d2wEc7Ifq',
   'Run Away.': 'https://open.spotify.com/track/55xoYyjpkHRsZbQ4M98gcK',
+  'HPP': 'https://open.spotify.com/track/2GnhGObiwhOFeCazZpEEH5',
+  'BLEM!': 'https://open.spotify.com/track/5IGDka59vexfDbJgbH0bwz',
+  'Brume': 'https://open.spotify.com/track/1vZNuSI9pjrkpFG7jJzrCn',
 };
 
 // Clips YouTube par titre. Si un titre n'est pas listé ici => pas de bouton YouTube
@@ -35,14 +38,14 @@ const YOUTUBE_BY_TITLE = {
 // - sinon          => clic ouvre directement Spotify
 function ReleaseRow({ index, title, duration, accent }) {
   const [open, setOpen] = useState(false);
-  const spotify = SPOTIFY_ARTIST;
+  const spotify = SPOTIFY_BY_TITLE[title] || SPOTIFY_ARTIST;
   const youtube = YOUTUBE_BY_TITLE[title] || null;
 
   // Titre sans clip : vrai lien vers sa page Spotify, ligne entière cliquable.
   if (!youtube) {
     return (
       <a
-        href={SPOTIFY_BY_TITLE[title] || SPOTIFY_ARTIST}
+        href={spotify}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Écouter ${title} sur Spotify`}
