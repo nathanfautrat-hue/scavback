@@ -160,7 +160,7 @@ function progressBar(filled, total, color) {
 
 // Frise des 3 étapes : 'done' | 'active' | 'todo'
 function timeline(states, color) {
-  const labels = ['COMMANDE<br>REÇUE', 'VALIDATION<br>JUMISTO', 'TRAVAIL SUR<br>TON SON'];
+  const labels = ['COMMANDE<br>REÇUE', 'PAIEMENT<br>CONFIRMÉ', 'TRAVAIL SUR<br>TON SON'];
   const cell = (st, i) => {
     const c = st === 'done' ? '#ffffff' : st === 'active' ? color : '#444444';
     const mark = st === 'done' ? '&#10003;' : st === 'active' ? '&#9679;' : '&#9675;';
@@ -315,11 +315,11 @@ export function emailCommandeAcceptee(order) {
   <tr><td style="padding:22px 28px 0;">${recapBox(order, '#333333')}</td></tr>`;
   const html = statusShell({
     color: GREEN,
-    hud: 'REC. 02 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; ' + order.order_number,
+    hud: 'REC. 01 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; ' + order.order_number,
     terminal: '&gt; ACCÈS_AUTORISÉ &#10003;',
     title: 'Commande',
     accentWord: 'validée',
-    intro: `${prenom}, Jumisto a validé ta commande. Ton espace est ouvert : dépose tes pistes et c'est parti.`,
+    intro: `${prenom}, ton paiement est confirmé et ta commande est validée. Ton espace est ouvert : dépose tes pistes et c'est parti.`,
     filled: 12,
     states: ['done', 'done', 'active'],
     middle,

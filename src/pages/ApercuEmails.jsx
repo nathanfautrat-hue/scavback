@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  emailConfirmationCommande,
   emailLivraison,
   emailBienvenue,
   emailPanierAbandonne,
@@ -23,8 +22,7 @@ const MOCK_ORDER = {
 };
 
 const EMAILS = [
-  { key: 'confirmation', label: '1 · En attente de validation', build: () => emailConfirmationCommande(MOCK_ORDER) },
-  { key: 'acceptee', label: '2 · Commande validée', build: () => emailCommandeAcceptee(MOCK_ORDER) },
+  { key: 'acceptee', label: 'Commande validée (envoyé après paiement)', build: () => emailCommandeAcceptee(MOCK_ORDER) },
   { key: 'livraison', label: 'Livraison / Rendu prêt', build: () => emailLivraison(MOCK_ORDER, 'https://wetransfer.com/exemple') },
   { key: 'bienvenue', label: 'Bienvenue', build: () => emailBienvenue('Jordan') },
   { key: 'panier', label: 'Panier abandonné', build: () => emailPanierAbandonne('Jordan', 'Mix + Master') },
