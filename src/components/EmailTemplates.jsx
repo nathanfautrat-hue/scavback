@@ -117,18 +117,138 @@ function p(text) {
   return `<p style="color:#cccccc;font-size:14px;line-height:1.7;margin:0 0 8px;font-family:Arial,sans-serif;">${text}</p>`;
 }
 
-// ─── EMAIL 1 — Confirmation de commande ───────────────────────────────────────
+// ─── Mails de statut premium (en attente / validée) ───────────────────────────
+// Univers du site : HUD de caméra, terminal, barre de chargement façon PageTransition.
+const SITE = 'https://scavback.fr';
+const CONTACT = 'contact@scavback.fr';
+const PAYPAL_ME = 'https://www.paypal.com/paypalme/SCAVBACKK';
+const MONO = "'Courier New',Courier,monospace";
+const SANS = 'Arial,Helvetica,sans-serif';
+
+function signatureHtml() {
+  const a = (href, t, c = '#e0e0e0') => `<a href="${href}" style="color:${c};text-decoration:none;">${t}</a>`;
+  return `
+<table cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="border-collapse:collapse;background:#020202;">
+  <tr><td colspan="3" height="3" bgcolor="#cc0000" style="background:#cc0000;font-size:0;line-height:0;height:3px;">&nbsp;</td></tr>
+  <tr>
+    <td valign="middle" style="padding:16px 0 16px 16px;"><a href="${SITE}"><img src="${SITE}/email/logo-signature.png" width="72" height="75" alt="SCAVBACK" style="display:block;border:0;width:72px;height:75px;"></a></td>
+    <td width="1" bgcolor="#262626" style="background:#262626;width:1px;font-size:0;">&nbsp;</td>
+    <td valign="middle" style="padding:14px 20px 14px 16px;font-family:${SANS};">
+      <div style="font-size:17px;font-weight:900;letter-spacing:3px;line-height:1;color:#ffffff;">SCAV<span style="color:#cc0000;">BACK</span></div>
+      <div style="font-family:${MONO};font-size:11px;color:#7a7a7a;margin-top:9px;line-height:1.7;">
+        <span style="color:#cc0000;">&gt;</span> ${a('mailto:' + CONTACT, CONTACT)}<br>
+        <span style="color:#cc0000;">&gt;</span> ${a(SITE, 'scavback.fr')}
+      </div>
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:2px;margin-top:8px;">
+        ${a('https://www.instagram.com/scavback', 'INSTAGRAM')}<span style="color:#444;"> / </span>${a('https://www.youtube.com/@SCAVBACK', 'YOUTUBE')}
+      </div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// Barre de progression en cellules (fiable dans Gmail / Outlook, contrairement aux caractères de bloc)
+function progressBar(filled, total, color) {
+  let cells = '';
+  for (let i = 0; i < total; i++) {
+    const on = i < filled;
+    cells += `<td width="${Math.floor(100 / total)}%" height="10" bgcolor="${on ? color : '#1c1c1c'}" style="background:${on ? color : '#1c1c1c'};height:10px;font-size:0;line-height:0;">&nbsp;</td>`;
+    if (i < total - 1) cells += `<td width="3" style="font-size:0;">&nbsp;</td>`;
+  }
+  return `<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation"><tr>${cells}</tr></table>`;
+}
+
+// Frise des 3 étapes : 'done' | 'active' | 'todo'
+function timeline(states, color) {
+  const labels = ['COMMANDE<br>REÇUE', 'VÉRIFICATION<br>PAIEMENT', 'TRAVAIL SUR<br>TON SON'];
+  const cell = (st, i) => {
+    const c = st === 'done' ? '#ffffff' : st === 'active' ? color : '#444444';
+    const mark = st === 'done' ? '&#10003;' : st === 'active' ? '&#9679;' : '&#9675;';
+    return `<td width="33%" valign="top" align="center" style="padding:0 4px;">
+      <div style="font-family:${MONO};font-size:16px;color:${st === 'done' ? color : c};">${mark}</div>
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:2px;color:${c};margin-top:6px;line-height:1.5;">0${i + 1}<br>${labels[i]}</div>
+    </td>`;
+  };
+  return `<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation"><tr>${states.map(cell).join('')}</tr></table>`;
+}
+
+function recapBox(order, color) {
+  const row = (k, v) => `<tr><td style="padding:7px 0;font-family:${MONO};font-size:11px;letter-spacing:2px;color:#7a7a7a;">${k}</td><td align="right" style="padding:7px 0;font-family:${SANS};font-size:14px;font-weight:700;color:#ffffff;">${v}</td></tr>`;
+  const total = order.total != null ? `${Number(order.total).toFixed(2).replace('.', ',')} €` : '';
+  const offre = (order.services || []).join(', ');
+  const qte = order.quantity > 1 ? ` × ${order.quantity}` : '';
+  return `<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="border:1px solid ${color};background:#020202;">
+    <tr><td style="padding:14px 20px 4px;font-family:${MONO};font-size:10px;letter-spacing:3px;color:${color};">// RÉCAPITULATIF</td></tr>
+    <tr><td style="padding:0 20px 12px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+      ${row('OFFRE', offre + qte)}${row('MONTANT', total)}${row('COMMANDE', '#' + order.order_number)}
+    </table></td></tr>
+  </table>`;
+}
+
+function statusShell({ color, hud, terminal, title, accentWord, intro, filled, states, middle, cta }) {
+  return `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="color-scheme" content="dark"></head>
+<body style="margin:0;padding:0;background:#020202;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="background:#020202;">
+<tr><td align="center" style="padding:28px 12px;">
+<table width="600" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#0a0a0a" style="max-width:600px;width:100%;background:#0a0a0a;border:1px solid #1c1c1c;">
+  <tr><td height="3" bgcolor="${color}" style="background:${color};font-size:0;line-height:0;">&nbsp;</td></tr>
+  <tr><td style="padding:14px 28px 0;font-family:${MONO};font-size:10px;letter-spacing:2px;color:#4A5D66;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation"><tr>
+      <td>${hud}</td><td align="right" style="color:${color};">&#9679; LIVE</td>
+    </tr></table>
+  </td></tr>
+  <tr><td align="center" style="padding:26px 28px 0;">
+    <a href="${SITE}"><img src="${SITE}/email/logo-mail.png" width="150" height="177" alt="SCAVBACK" style="display:block;border:0;width:150px;height:177px;"></a>
+  </td></tr>
+  <tr><td align="center" style="padding:20px 28px 0;font-family:${MONO};font-size:12px;letter-spacing:2px;color:${color};">${terminal}</td></tr>
+  <tr><td align="center" style="padding:10px 28px 0;font-family:${SANS};font-size:40px;font-weight:900;letter-spacing:-1px;line-height:1.02;color:#ffffff;text-transform:uppercase;">
+    ${title}<br><span style="color:${color};">${accentWord}</span>
+  </td></tr>
+  <tr><td align="center" style="padding:18px 44px 0;font-family:${SANS};font-size:15px;line-height:1.7;color:#bdbdbd;">${intro}</td></tr>
+  <tr><td style="padding:30px 40px 0;">${progressBar(filled, 12, color)}</td></tr>
+  <tr><td style="padding:18px 28px 0;">${timeline(states, color)}</td></tr>
+  ${middle}
+  ${cta}
+  <tr><td style="padding:34px 28px 28px;">${signatureHtml()}</td></tr>
+</table>
+<div style="font-family:${MONO};font-size:10px;letter-spacing:2px;color:#444;padding-top:16px;">© SCAVBACK — scavback.fr</div>
+</td></tr></table>
+</body></html>`;
+}
+
+const whiteButton = (href, label) => `<tr><td align="center" style="padding:30px 28px 0;">
+  <a href="${href}" style="display:inline-block;background:#ffffff;color:#000000;font-family:${MONO};font-size:12px;font-weight:700;letter-spacing:3px;text-decoration:none;padding:15px 30px;">${label} &rarr;</a>
+</td></tr>`;
+
+// ─── EMAIL 1 — Commande reçue, en attente de validation ───────────────────────
 export function emailConfirmationCommande(order) {
-  const prenom = order.prenom || order.user_name || 'Cher client';
-  const body = `
-    ${h2('Ta commande SCAVBACK est confirmée 🎚️')}
-    ${p(`Bonjour <strong style="color:#ffffff;">${prenom}</strong>, merci pour ta confiance ! Ta commande a bien été enregistrée et sera traitée après vérification du paiement.`)}
-    ${orderInfoBox(order)}
-    ${statusBadge('#3a2600', '#cc6600', '#ffaa44', '⏳ EN ATTENTE DE VÉRIFICATION')}
-    ${ctaButton('https://scavback.fr/Commander?tab=suivi', 'Suivre ma commande')}
-    ${trackingBox(order.order_number)}
-  `;
-  return { subject: `Ta commande SCAVBACK est confirmée 🎚️ — #${order.order_number}`, html: wrapTemplate(body) };
+  const AMBER = '#ffaa00';
+  const prenom = order.prenom || order.user_name || 'Salut';
+  const montant = order.total != null ? Number(order.total).toFixed(2) : '';
+  const middle = `
+  <tr><td style="padding:30px 28px 0;">${recapBox(order, AMBER)}</td></tr>
+  <tr><td style="padding:26px 28px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="border:1px dashed #333;">
+      <tr><td style="padding:18px 20px;font-family:${SANS};font-size:13px;line-height:1.7;color:#9a9a9a;">
+        <div style="font-family:${MONO};font-size:10px;letter-spacing:3px;color:${AMBER};margin-bottom:6px;">// PAS ENCORE PAYÉ ?</div>
+        Règle ta commande avec PayPal et indique le numéro <strong style="color:#ffffff;">#${order.order_number}</strong> en note du paiement. La validation part dès que je le vois passer.
+      </td></tr>
+    </table>
+  </td></tr>`;
+  const html = statusShell({
+    color: AMBER,
+    hud: 'REC. 01 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; #' + order.order_number,
+    terminal: '&gt; VÉRIFICATION_DU_PAIEMENT...',
+    title: 'Commande',
+    accentWord: 'en attente',
+    intro: `${prenom}, ta commande est bien enregistrée. Je vérifie ton paiement : tu reçois un mail de validation dès que c'est bon.`,
+    filled: 6,
+    states: ['done', 'active', 'todo'],
+    middle,
+    cta: whiteButton(`${PAYPAL_ME}/${montant}`, `PAYER ${montant.replace('.', ',')} € AVEC PAYPAL`),
+  });
+  return { subject: `Commande reçue, en attente de validation — #${order.order_number}`, html };
 }
 
 // ─── EMAIL 2 — Livraison / Rendu prêt ─────────────────────────────────────────
@@ -175,16 +295,33 @@ export function emailPanierAbandonne(userName = 'Cher artiste', offerLabel = 'to
 }
 
 // ─── Emails internes (statuts commande) — conservés ────────────────────────────
+// ─── EMAIL 2 — Commande validée ────────────────────────────────────────────────
 export function emailCommandeAcceptee(order) {
-  const prenom = order.prenom || order.user_name || 'Cher client';
-  const body = `
-    ${h2('Bonne nouvelle ! 🎉')}
-    ${p(`Bonjour <strong style="color:#ffffff;">${prenom}</strong>, ton paiement a été vérifié avec succès. On traite ta musique et on te livre dans les meilleurs délais.`)}
-    ${orderInfoBox(order)}
-    ${statusBadge('#0f3d1f', '#2d8a42', '#4ade80', '✅ COMMANDE ACCEPTÉE')}
-    ${trackingBox(order.order_number)}
-  `;
-  return { subject: `Ta commande #${order.order_number} a été acceptée — SCAVBACK Audio Lab`, html: wrapTemplate(body) };
+  const GREEN = '#00ff41';
+  const prenom = order.prenom || order.user_name || 'Salut';
+  const mailto = `mailto:${CONTACT}?subject=${encodeURIComponent('Mes pistes — commande #' + order.order_number)}`;
+  const step = (n, t, d) => `<tr><td valign="top" width="38" style="padding:12px 0;font-family:${MONO};font-size:13px;color:${GREEN};">0${n}</td><td style="padding:12px 0;border-top:1px solid #1c1c1c;font-family:${SANS};"><div style="font-size:14px;font-weight:700;color:#ffffff;">${t}</div><div style="font-size:13px;line-height:1.6;color:#9a9a9a;margin-top:3px;">${d}</div></td></tr>`;
+  const middle = `
+  <tr><td style="padding:30px 28px 0;">${recapBox(order, GREEN)}</td></tr>
+  <tr><td style="padding:30px 28px 0;font-family:${MONO};font-size:10px;letter-spacing:3px;color:#7a7a7a;">// LA SUITE</td></tr>
+  <tr><td style="padding:6px 28px 0;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+    ${step(1, 'Envoie tes pistes', "Réponds à ce mail avec un lien WeTransfer ou Google Drive. Format WAV 24 bits / 44,1 kHz, voix synchronisées avec l'instru.")}
+    ${step(2, 'Je travaille ton son', "Je reviens vers toi si j'ai une question.")}
+    ${step(3, 'Tu reçois ton rendu', "Je t'envoie le fichier final par mail, prêt à sortir.")}
+  </table></td></tr>`;
+  const html = statusShell({
+    color: GREEN,
+    hud: 'REC. 02 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; #' + order.order_number,
+    terminal: '&gt; ACCÈS_AUTORISÉ &#10003;',
+    title: 'Commande',
+    accentWord: 'validée',
+    intro: `${prenom}, ton paiement est vérifié, ta commande est lancée. Il ne me manque plus que tes pistes.`,
+    filled: 12,
+    states: ['done', 'done', 'active'],
+    middle,
+    cta: whiteButton(mailto, 'ENVOYER MES PISTES'),
+  });
+  return { subject: `Commande validée ✓ — #${order.order_number}`, html };
 }
 
 export function emailCommandeRefusee(order) {

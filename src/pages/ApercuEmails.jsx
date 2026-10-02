@@ -23,11 +23,11 @@ const MOCK_ORDER = {
 };
 
 const EMAILS = [
-  { key: 'confirmation', label: 'Confirmation de commande', build: () => emailConfirmationCommande(MOCK_ORDER) },
+  { key: 'confirmation', label: '1 · En attente de validation', build: () => emailConfirmationCommande(MOCK_ORDER) },
+  { key: 'acceptee', label: '2 · Commande validée', build: () => emailCommandeAcceptee(MOCK_ORDER) },
   { key: 'livraison', label: 'Livraison / Rendu prêt', build: () => emailLivraison(MOCK_ORDER, 'https://wetransfer.com/exemple') },
   { key: 'bienvenue', label: 'Bienvenue', build: () => emailBienvenue('Jordan') },
   { key: 'panier', label: 'Panier abandonné', build: () => emailPanierAbandonne('Jordan', 'Mix + Master') },
-  { key: 'acceptee', label: 'Commande acceptée', build: () => emailCommandeAcceptee(MOCK_ORDER) },
   { key: 'refusee', label: 'Commande refusée', build: () => emailCommandeRefusee(MOCK_ORDER) },
   { key: 'essai', label: "Confirmation d'essai", build: () => emailConfirmationEssai({ userName: 'Jordan', projectName: 'NOCTURNE' }) },
 ];
