@@ -121,7 +121,7 @@ function p(text) {
 // Univers du site : HUD de caméra, terminal, barre de chargement façon PageTransition.
 const SITE = 'https://scavback.fr';
 const CONTACT = 'contact@scavback.fr';
-const PAYPAL_ME = 'https://www.paypal.com/paypalme/SCAVBACKK';
+const ESPACE = `${SITE}/Commander?tab=suivi`;
 const MONO = "'Courier New',Courier,monospace";
 const SANS = 'Arial,Helvetica,sans-serif';
 
@@ -160,7 +160,7 @@ function progressBar(filled, total, color) {
 
 // Frise des 3 étapes : 'done' | 'active' | 'todo'
 function timeline(states, color) {
-  const labels = ['COMMANDE<br>REÇUE', 'VÉRIFICATION<br>PAIEMENT', 'TRAVAIL SUR<br>TON SON'];
+  const labels = ['COMMANDE<br>REÇUE', 'VALIDATION<br>JUMISTO', 'TRAVAIL SUR<br>TON SON'];
   const cell = (st, i) => {
     const c = st === 'done' ? '#ffffff' : st === 'active' ? color : '#444444';
     const mark = st === 'done' ? '&#10003;' : st === 'active' ? '&#9679;' : '&#9675;';
@@ -178,10 +178,22 @@ function recapBox(order, color) {
   const offre = (order.services || []).join(', ');
   const qte = order.quantity > 1 ? ` × ${order.quantity}` : '';
   return `<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="border:1px solid ${color};background:#020202;">
-    <tr><td style="padding:14px 20px 4px;font-family:${MONO};font-size:10px;letter-spacing:3px;color:${color};">// RÉCAPITULATIF</td></tr>
+    <tr><td style="padding:14px 20px 4px;font-family:${MONO};font-size:10px;letter-spacing:3px;color:${color === '#333333' ? '#7a7a7a' : color};">// RÉCAPITULATIF</td></tr>
     <tr><td style="padding:0 20px 12px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-      ${row('OFFRE', offre + qte)}${row('MONTANT', total)}${row('COMMANDE', '#' + order.order_number)}
+      ${row('OFFRE', offre + qte)}${row('MONTANT', total)}
     </table></td></tr>
+  </table>`;
+}
+
+// Bloc « numéro de commande » : c'est la clé d'accès à l'espace commande (discussion + fichiers).
+function orderKeyBox(order, color) {
+  return `<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="background:#020202;border:1px solid ${color};">
+    <tr><td align="center" style="padding:20px 20px 4px;font-family:${MONO};font-size:10px;letter-spacing:3px;color:${color};">// TON NUMÉRO DE COMMANDE</td></tr>
+    <tr><td align="center" style="padding:6px 20px 0;font-family:${MONO};font-size:30px;font-weight:700;letter-spacing:4px;color:#ffffff;">${order.order_number}</td></tr>
+    <tr><td align="center" style="padding:12px 28px 20px;font-family:${SANS};font-size:13px;line-height:1.7;color:#9a9a9a;">
+      <strong style="color:#ffffff;">Garde-le précieusement.</strong> C'est ta clé pour ton espace commande sur scavback.fr
+      (<span style="color:#ffffff;">Services Studio → Audio Lab → Vos commandes</span>) : c'est là qu'on discute et que tu déposes tes fichiers.
+    </td></tr>
   </table>`;
 }
 
@@ -225,30 +237,22 @@ const whiteButton = (href, label) => `<tr><td align="center" style="padding:30px
 export function emailConfirmationCommande(order) {
   const AMBER = '#ffaa00';
   const prenom = order.prenom || order.user_name || 'Salut';
-  const montant = order.total != null ? Number(order.total).toFixed(2) : '';
   const middle = `
-  <tr><td style="padding:30px 28px 0;">${recapBox(order, AMBER)}</td></tr>
-  <tr><td style="padding:26px 28px 0;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="border:1px dashed #333;">
-      <tr><td style="padding:18px 20px;font-family:${SANS};font-size:13px;line-height:1.7;color:#9a9a9a;">
-        <div style="font-family:${MONO};font-size:10px;letter-spacing:3px;color:${AMBER};margin-bottom:6px;">// PAS ENCORE PAYÉ ?</div>
-        Règle ta commande avec PayPal et indique le numéro <strong style="color:#ffffff;">#${order.order_number}</strong> en note du paiement. La validation part dès que je le vois passer.
-      </td></tr>
-    </table>
-  </td></tr>`;
+  <tr><td style="padding:30px 28px 0;">${orderKeyBox(order, AMBER)}</td></tr>
+  <tr><td style="padding:22px 28px 0;">${recapBox(order, '#333333')}</td></tr>`;
   const html = statusShell({
     color: AMBER,
-    hud: 'REC. 01 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; #' + order.order_number,
-    terminal: '&gt; VÉRIFICATION_DU_PAIEMENT...',
+    hud: 'REC. 01 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; ' + order.order_number,
+    terminal: '&gt; COMMANDE_EN_COURS_DE_VALIDATION...',
     title: 'Commande',
     accentWord: 'en attente',
-    intro: `${prenom}, ta commande est bien enregistrée. Je vérifie ton paiement : tu reçois un mail de validation dès que c'est bon.`,
+    intro: `${prenom}, merci pour ton paiement, ta commande est bien enregistrée. Jumisto la valide et tu reçois un mail dès que c'est bon.`,
     filled: 6,
     states: ['done', 'active', 'todo'],
     middle,
-    cta: whiteButton(`${PAYPAL_ME}/${montant}`, `PAYER ${montant.replace('.', ',')} € AVEC PAYPAL`),
+    cta: whiteButton(ESPACE, 'OUVRIR MON ESPACE COMMANDE'),
   });
-  return { subject: `Commande reçue, en attente de validation — #${order.order_number}`, html };
+  return { subject: `Commande reçue, en attente de validation — ${order.order_number}`, html };
 }
 
 // ─── EMAIL 2 — Livraison / Rendu prêt ─────────────────────────────────────────
@@ -299,29 +303,29 @@ export function emailPanierAbandonne(userName = 'Cher artiste', offerLabel = 'to
 export function emailCommandeAcceptee(order) {
   const GREEN = '#00ff41';
   const prenom = order.prenom || order.user_name || 'Salut';
-  const mailto = `mailto:${CONTACT}?subject=${encodeURIComponent('Mes pistes — commande #' + order.order_number)}`;
   const step = (n, t, d) => `<tr><td valign="top" width="38" style="padding:12px 0;font-family:${MONO};font-size:13px;color:${GREEN};">0${n}</td><td style="padding:12px 0;border-top:1px solid #1c1c1c;font-family:${SANS};"><div style="font-size:14px;font-weight:700;color:#ffffff;">${t}</div><div style="font-size:13px;line-height:1.6;color:#9a9a9a;margin-top:3px;">${d}</div></td></tr>`;
   const middle = `
-  <tr><td style="padding:30px 28px 0;">${recapBox(order, GREEN)}</td></tr>
+  <tr><td style="padding:30px 28px 0;">${orderKeyBox(order, GREEN)}</td></tr>
   <tr><td style="padding:30px 28px 0;font-family:${MONO};font-size:10px;letter-spacing:3px;color:#7a7a7a;">// LA SUITE</td></tr>
   <tr><td style="padding:6px 28px 0;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-    ${step(1, 'Envoie tes pistes', "Réponds à ce mail avec un lien WeTransfer ou Google Drive. Format WAV 24 bits / 44,1 kHz, voix synchronisées avec l'instru.")}
-    ${step(2, 'Je travaille ton son', "Je reviens vers toi si j'ai une question.")}
-    ${step(3, 'Tu reçois ton rendu', "Je t'envoie le fichier final par mail, prêt à sortir.")}
-  </table></td></tr>`;
+    ${step(1, 'Ouvre ton espace commande', 'Sur scavback.fr, onglet « Vos commandes », entre ton numéro de commande.')}
+    ${step(2, 'Dépose tes pistes', "Directement sur le site, pas besoin de WeTransfer. Format WAV 24 bits / 44,1 kHz, voix synchronisées avec l'instru.")}
+    ${step(3, 'On avance ensemble', 'Tu échanges avec Jumisto dans la discussion et tu y récupères ton rendu final.')}
+  </table></td></tr>
+  <tr><td style="padding:22px 28px 0;">${recapBox(order, '#333333')}</td></tr>`;
   const html = statusShell({
     color: GREEN,
-    hud: 'REC. 02 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; #' + order.order_number,
+    hud: 'REC. 02 &nbsp;/&nbsp; AUDIO_LAB &nbsp;/&nbsp; ' + order.order_number,
     terminal: '&gt; ACCÈS_AUTORISÉ &#10003;',
     title: 'Commande',
     accentWord: 'validée',
-    intro: `${prenom}, ton paiement est vérifié, ta commande est lancée. Il ne me manque plus que tes pistes.`,
+    intro: `${prenom}, Jumisto a validé ta commande. Ton espace est ouvert : dépose tes pistes et c'est parti.`,
     filled: 12,
     states: ['done', 'done', 'active'],
     middle,
-    cta: whiteButton(mailto, 'ENVOYER MES PISTES'),
+    cta: whiteButton(ESPACE, 'DÉPOSER MES PISTES'),
   });
-  return { subject: `Commande validée ✓ — #${order.order_number}`, html };
+  return { subject: `Commande validée ✓ — ${order.order_number}`, html };
 }
 
 export function emailCommandeRefusee(order) {

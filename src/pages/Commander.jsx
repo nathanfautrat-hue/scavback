@@ -16,9 +16,12 @@ const OFFERS = [
 const PAYS = ['France', 'Belgique', 'Suisse', 'Canada', 'Luxembourg', 'Autre'];
 
 function generateOrderNumber() {
-  const year = new Date().getFullYear();
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `SCB-${year}-${rand}`;
+  // Le numéro sert de clé pour l'espace commande : 8 caractères aléatoires (~1 000 milliards de combinaisons),
+  // sans 0/O/1/I pour qu'il se recopie sans erreur.
+  const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const rnd = crypto.getRandomValues(new Uint32Array(8));
+  const part = (a, b) => Array.from(rnd.slice(a, b), n => ALPHA[n % ALPHA.length]).join('');
+  return `SCB-${part(0, 4)}-${part(4, 8)}`;
 }
 
 // ─── ONGLET ESSAI GRATUIT ────────────────────────────────────────────────────

@@ -13,7 +13,7 @@ import {
 // envoyés, cette page sert à VOIR le design demandé au cahier des charges #04).
 
 const MOCK_ORDER = {
-  order_number: 'SCB-2026-4821',
+  order_number: 'SCB-7K4Q-92XF',
   prenom: 'Jordan',
   user_name: 'Jordan',
   services: ['Mix + Master'],
