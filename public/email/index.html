@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Kit mail — SCAVBACK</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root { --bg:#020202; --panel:#0a0a0a; --line:#1c1c1c; --txt:#e0e0e0; --dim:#7a7a7a; --red:#cc0000; --green:#00ff41; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:"Courier New", monospace; }
+  .wrap { max-width:1180px; margin:0 auto; padding:48px 20px 80px; }
+  .tag { color:var(--red); font-size:11px; letter-spacing:.3em; text-transform:uppercase; }
+  h1 { font-family:Arial, sans-serif; font-weight:900; font-size:clamp(34px,6vw,64px); letter-spacing:-.04em; margin:.2em 0 .1em; text-transform:uppercase; }
+  h1 span { color:#8B0000; }
+  .lead { color:var(--dim); font-size:13px; max-width:640px; line-height:1.7; }
+  section { margin-top:56px; }
+  .head { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:24px; }
+  .head h2 { font-family:Arial, sans-serif; font-size:20px; letter-spacing:.08em; text-transform:uppercase; margin:0; }
+  .head h2 b { color:var(--red); font-weight:400; margin-right:10px; font-family:"Courier New", monospace; }
+  .grid { display:grid; grid-template-columns: 300px 1fr; gap:28px; align-items:start; }
+  @media (max-width: 900px) { .grid { grid-template-columns:1fr; } }
+  .panel { background:var(--panel); border:1px solid var(--line); padding:20px; }
+  label { display:block; font-size:10px; letter-spacing:.25em; text-transform:uppercase; color:var(--dim); margin:14px 0 6px; }
+  label:first-child { margin-top:0; }
+  input { width:100%; background:#000; border:1px solid #262626; color:#fff; padding:10px 12px; font:13px "Courier New", monospace; outline:none; }
+  input:focus { border-color:var(--red); }
+  .btn { display:inline-flex; align-items:center; gap:10px; background:#fff; color:#000; border:0; padding:13px 20px; font:700 11px "Courier New", monospace; letter-spacing:.25em; text-transform:uppercase; cursor:pointer; margin-top:18px; width:100%; justify-content:center; }
+  .btn.ghost { background:transparent; color:#fff; border:1px solid #333; }
+  .btn:hover { background:var(--red); color:#fff; }
+  .ok { color:var(--green); font-size:11px; letter-spacing:.15em; min-height:16px; margin-top:10px; text-align:center; }
+  .stage { background:#1a1a1a; border:1px solid var(--line); padding:28px; overflow:auto; }
+  .stage.light { background:#f2f2f2; }
+  .switch { font-size:10px; letter-spacing:.2em; color:var(--dim); cursor:pointer; background:none; border:1px solid #262626; padding:6px 10px; }
+  .steps { margin:20px 0 0; padding:0; list-style:none; counter-reset:s; }
+  .steps li { counter-increment:s; font-size:12px; color:#bbb; line-height:1.6; padding:8px 0 8px 34px; position:relative; border-top:1px solid var(--line); }
+  .steps li::before { content:"0" counter(s); position:absolute; left:0; color:var(--red); }
+  .steps b { color:#fff; font-weight:400; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">/ / Studio _ Kit mail</div>
+  <h1>SCAV<span>BACK</span> mail kit</h1>
+  <p class="lead">Ta signature et ton mail de remerciement, prêts à copier-coller dans Gmail. Remplis les champs à gauche, l'aperçu se met à jour, puis clique sur « Copier ».</p>
+
+  <!-- ─────────────── SIGNATURE ─────────────── -->
+  <section>
+    <div class="head">
+      <h2><b>01</b>Signature</h2>
+      <button class="switch" data-target="stage-sig">FOND CLAIR / SOMBRE</button>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <label for="s-nom">Nom affiché</label>
+        <input id="s-nom" value="Rayan">
+        <label for="s-role">Rôle</label>
+        <input id="s-role" value="SCAVBACK Audio Lab">
+        <label for="s-mail">E-mail</label>
+        <input id="s-mail" value="contact@scavback.fr">
+        <button class="btn" data-copy="sig">Copier la signature →</button>
+        <div class="ok" id="ok-sig"></div>
+        <ol class="steps">
+          <li>Dans Gmail sur ordinateur : <b>roue dentée → Voir tous les paramètres</b>.</li>
+          <li>Onglet <b>Général</b>, rubrique <b>Signature</b> → <b>Créer</b>.</li>
+          <li>Colle avec <b>Ctrl + V</b>, puis tout en bas <b>Enregistrer les modifications</b>.</li>
+          <li>Dans « Valeurs par défaut », choisis la signature pour les <b>nouveaux e-mails</b> et les <b>réponses</b>.</li>
+        </ol>
+      </div>
+      <div class="stage" id="stage-sig"><div id="sig"></div></div>
+    </div>
+  </section>
+
+  <!-- ─────────────── MAIL MERCI ─────────────── -->
+  <section>
+    <div class="head">
+      <h2><b>02</b>Mail « Merci pour ton achat »</h2>
+      <button class="switch" data-target="stage-mail">FOND CLAIR / SOMBRE</button>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <label for="m-prenom">Prénom du client</label>
+        <input id="m-prenom" value="Jordan">
+        <label for="m-offre">Offre achetée</label>
+        <input id="m-offre" value="Mix + Master">
+        <label for="m-prix">Montant</label>
+        <input id="m-prix" value="20 €">
+        <label for="m-num">N° de commande</label>
+        <input id="m-num" value="SCB-2026-0001">
+        <label>Objet du mail</label>
+        <input id="m-objet" readonly>
+        <button class="btn ghost" data-copy="objet">Copier l'objet</button>
+        <button class="btn" data-copy="mail">Copier le mail →</button>
+        <div class="ok" id="ok-mail"></div>
+        <ol class="steps">
+          <li>Gmail → <b>Nouveau message</b>, colle l'objet puis le mail (<b>Ctrl + V</b>).</li>
+          <li>Supprime ta signature automatique en bas : elle est déjà dans le mail.</li>
+          <li>Vérifie le prénom et le montant, puis <b>Envoyer</b>.</li>
+        </ol>
+      </div>
+      <div class="stage" id="stage-mail"><div id="mail"></div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const SITE = 'https://scavback.fr';
+// Images : servies par le site en ligne (seule adresse valable dans un mail). En aperçu local, on prend le serveur local.
+const IMG = location.hostname.endsWith('scavback.fr') ? SITE : location.origin;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Signature : tableau HTML compatible Gmail / Outlook / Apple Mail (styles en ligne, police système).
+function signature() {
+  const nom = esc($('s-nom').value), role = esc($('s-role').value), mail = esc($('s-mail').value);
+  const link = (href, txt) => `<a href="${href}" style="color:#e0e0e0;text-decoration:none;">${txt}</a>`;
+  return `
+<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;background:#020202;" bgcolor="#020202">
+  <tr><td colspan="3" height="3" bgcolor="#cc0000" style="background:#cc0000;font-size:0;line-height:0;height:3px;">&nbsp;</td></tr>
+  <tr>
+    <td valign="middle" style="padding:18px 0 18px 18px;" bgcolor="#020202">
+      <a href="${SITE}" style="text-decoration:none;"><img src="${IMG}/email/logo-signature.png" width="84" height="87" alt="SCAVBACK" style="display:block;border:0;width:84px;height:87px;"></a>
+    </td>
+    <td width="1" bgcolor="#262626" style="background:#262626;width:1px;font-size:0;">&nbsp;</td>
+    <td valign="middle" style="padding:16px 22px 16px 18px;font-family:Arial,Helvetica,sans-serif;" bgcolor="#020202">
+      <div style="font-size:19px;font-weight:900;letter-spacing:3px;line-height:1;color:#ffffff;">SCAV<span style="color:#cc0000;">BACK</span></div>
+      <div style="font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:1px;color:#e0e0e0;margin-top:8px;">${nom}<span style="color:#7a7a7a;"> — ${role}</span></div>
+      <div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#7a7a7a;margin-top:10px;line-height:1.7;">
+        <span style="color:#cc0000;">&gt;</span> ${link('mailto:' + mail, mail)}<br>
+        <span style="color:#cc0000;">&gt;</span> ${link(SITE, 'scavback.fr')}
+      </div>
+      <div style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;margin-top:10px;">
+        ${link('https://www.instagram.com/scavback', 'INSTAGRAM')}<span style="color:#444;"> / </span>${link('https://www.youtube.com/@SCAVBACK', 'YOUTUBE')}<span style="color:#444;"> / </span><a href="https://scavback.gumroad.com/" style="color:#cc0000;text-decoration:none;">PRESETS</a>
+      </div>
+    </td>
+  </tr>
+</table>`;
+}
+
+// Mail de remerciement : même charte que le site (noir, rouge, terminal).
+function mailHtml() {
+  const prenom = esc($('m-prenom').value || 'toi'), offre = esc($('m-offre').value);
+  const prix = esc($('m-prix').value), num = esc($('m-num').value);
+  const mailto = `mailto:${esc($('s-mail').value)}?subject=${encodeURIComponent('Mes pistes — commande ' + $('m-num').value)}`;
+  const row = (k, v) => `<tr><td style="padding:7px 0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:2px;color:#7a7a7a;">${k}</td><td align="right" style="padding:7px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;">${v}</td></tr>`;
+  const step = (n, t, d) => `<tr><td valign="top" width="38" style="padding:12px 0;font-family:'Courier New',Courier,monospace;font-size:13px;color:#cc0000;">0${n}</td><td style="padding:12px 0;border-top:1px solid #1c1c1c;font-family:Arial,Helvetica,sans-serif;"><div style="font-size:14px;font-weight:700;color:#ffffff;">${t}</div><div style="font-size:13px;line-height:1.6;color:#9a9a9a;margin-top:3px;">${d}</div></td></tr>`;
+  return `
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#020202" style="background:#020202;">
+<tr><td align="center" style="padding:28px 12px;">
+<table width="600" cellpadding="0" cellspacing="0" border="0" role="presentation" bgcolor="#0a0a0a" style="max-width:600px;width:100%;background:#0a0a0a;border:1px solid #1c1c1c;">
+  <tr><td height="3" bgcolor="#cc0000" style="background:#cc0000;font-size:0;line-height:0;">&nbsp;</td></tr>
+  <tr><td style="padding:14px 28px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#4A5D66;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation"><tr>
+      <td>REC. 01 &nbsp;/&nbsp; AUDIO_LAB</td><td align="right" style="color:#cc0000;">&#9679; ${num}</td>
+    </tr></table>
+  </td></tr>
+  <tr><td align="center" style="padding:26px 28px 6px;">
+    <a href="${SITE}"><img src="${IMG}/email/logo-mail.png" width="190" height="225" alt="SCAVBACK" style="display:block;border:0;width:190px;height:225px;"></a>
+  </td></tr>
+  <tr><td align="center" style="padding:18px 28px 0;font-family:'Courier New',Courier,monospace;font-size:12px;letter-spacing:2px;color:#00ff41;">&gt; COMMANDE_REÇUE &#10003;</td></tr>
+  <tr><td align="center" style="padding:10px 28px 0;font-family:Arial,Helvetica,sans-serif;font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1.05;color:#ffffff;text-transform:uppercase;">
+    Merci pour<br>ton <span style="color:#cc0000;">achat</span>
+  </td></tr>
+  <tr><td align="center" style="padding:18px 44px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.7;color:#bdbdbd;">
+    ${prenom}, ton paiement est bien arrivé. Ton son est entre de bonnes mains, je m'en occupe.
+  </td></tr>
+  <tr><td style="padding:30px 28px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="border:1px solid #cc0000;background:#020202;" bgcolor="#020202">
+      <tr><td style="padding:14px 20px 6px;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#cc0000;">// RÉCAPITULATIF</td></tr>
+      <tr><td style="padding:0 20px 12px;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+        ${row('OFFRE', offre)}${row('MONTANT', prix)}${row('COMMANDE', num)}
+      </table></td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:30px 28px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:3px;color:#7a7a7a;">// LA SUITE</td></tr>
+  <tr><td style="padding:6px 28px 0;"><table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+    ${step(1, 'Envoie tes pistes', 'Réponds à ce mail avec un lien WeTransfer ou Google Drive. Format WAV 24 bits / 44,1 kHz, voix synchronisées avec l\'instru.')}
+    ${step(2, 'Je travaille ton son', 'Je m\'occupe de ton ' + offre + ' et je reviens vers toi si j\'ai une question.')}
+    ${step(3, 'Tu reçois ton rendu', 'Je t\'envoie le fichier final par mail, prêt à sortir.')}
+  </table></td></tr>
+  <tr><td align="center" style="padding:30px 28px 8px;">
+    <a href="${mailto}" style="display:inline-block;background:#ffffff;color:#000000;font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:700;letter-spacing:3px;text-decoration:none;padding:15px 30px;">ENVOYER MES PISTES &rarr;</a>
+  </td></tr>
+  <tr><td style="padding:34px 28px 28px;">${signature()}</td></tr>
+</table>
+<div style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#444;padding-top:16px;">© SCAVBACK — scavback.fr</div>
+</td></tr></table>`;
+}
+
+function subject() { return `Merci pour ton achat — commande ${$('m-num').value}`; }
+
+function render() {
+  $('sig').innerHTML = signature();
+  $('mail').innerHTML = mailHtml();
+  $('m-objet').value = subject();
+}
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', render));
+render();
+
+async function copyRich(html, okId) {
+  const ok = $(okId);
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()], { type: 'text/plain' }),
+    })]);
+  } catch {
+    // Secours : copie par sélection (navigateurs sans ClipboardItem)
+    const box = document.createElement('div'); box.innerHTML = html; box.style.position = 'fixed'; box.style.left = '-9999px';
+    document.body.appendChild(box);
+    const r = document.createRange(); r.selectNodeContents(box);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    document.execCommand('copy'); sel.removeAllRanges(); box.remove();
+  }
+  ok.textContent = '> COPIÉ ✓ — colle avec Ctrl + V';
+  setTimeout(() => ok.textContent = '', 3500);
+}
+
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+  const what = b.dataset.copy;
+  if (what === 'sig') copyRich(signature(), 'ok-sig');
+  if (what === 'mail') copyRich(mailHtml(), 'ok-mail');
+  if (what === 'objet') { await navigator.clipboard.writeText(subject()); $('ok-mail').textContent = '> OBJET COPIÉ ✓'; setTimeout(() => $('ok-mail').textContent = '', 3000); }
+}));
+
+document.querySelectorAll('.switch').forEach(b => b.addEventListener('click', () => $(b.dataset.target).classList.toggle('light')));
+</script>
+</body>
+</html>
